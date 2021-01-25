@@ -10,7 +10,6 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = 'token.json';
 
 export function connectGoogleCalendar(callback: any) {
-    console.log("Here")
     // Load client secrets from a local file.
     fs.readFile('credentials.json', (err, content) => {
         if (err) throw console.log('Error loading client secret file:', err);
@@ -32,7 +31,7 @@ function authorize(credentials: any, callback: any) {
 
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getAccessToken(oAuth2Client, callback);
+        if (err) return getAccessToken(oAuth2Client);
         oAuth2Client.setCredentials(JSON.parse(token.toString()));
         callback(oAuth2Client);
     });
@@ -44,7 +43,7 @@ function authorize(credentials: any, callback: any) {
  * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
-function getAccessToken(oAuth2Client: any, callback: any) {
+function getAccessToken(oAuth2Client: any) {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
@@ -64,7 +63,6 @@ function getAccessToken(oAuth2Client: any, callback: any) {
                 if (err) throw console.error(err);
                 console.log('Token stored to', TOKEN_PATH);
             });
-            callback(oAuth2Client);
         });
     });
 }
