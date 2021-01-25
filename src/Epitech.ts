@@ -4,13 +4,13 @@ import { ISchedule } from './Interfaces/Epitech/ISchedule';
 import { IScheduleRdv, SlotsEntity1 } from './Interfaces/Epitech/IScheduleRdv';
 import { calendar_v3 } from 'googleapis';
 
-function getScheduleEpitech(): Promise<ISchedule[] | undefined> {
+function getScheduleEpitech(): Promise<ISchedule[]> {
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/planning/load?format=json&start=${new Date().toISOString().split('T')[0]}&end=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`, (error, response, body) => {
             if (error)
-                resolve(undefined && console.error('error:', error));
+                throw console.error('error:', error);
             if (response.statusCode != 200)
-                resolve(undefined && console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body)));
+                throw console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body));
             resolve(JSON.parse(body));
         });
     });
@@ -20,9 +20,9 @@ function getInfosScheduleRdv(Schedule: ISchedule): Promise<SlotsEntity1 | undefi
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/module/${Schedule.scolaryear}/${Schedule.codemodule}/${Schedule.codeinstance}/${Schedule.codeacti}/rdv/?format=json`, (error, response, body) => {
             if (error)
-                resolve(undefined && console.error('error:', error));
+                throw console.error('error:', error);
             if (response.statusCode != 200)
-                resolve(undefined && console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body)));
+                throw console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body));
             var json: IScheduleRdv = JSON.parse(body);
             var groupId: number | undefined = json.group?.id;
             if (json.slots && groupId)
@@ -91,8 +91,7 @@ function getInfosScheduleRdv(Schedule: ISchedule): Promise<SlotsEntity1 | undefi
     Tp = "tp",
 */
 
-function getColorType(type: string): string
-{
+function getColorType(type: string): string {
     if (type == "exam") return "4";
     if (type == "class") return "9";
     if (type == "other") return "9";
@@ -127,13 +126,13 @@ function scheduleToGoogleCalendar(Schedule: ISchedule): calendar_v3.Schema$Event
 
     if (Schedule.rdv) {
         SchemaEvent.attendees = [];
-        // if (Schedule.rdv.master)
-        //     SchemaEvent.attendees.push({ email: Schedule.rdv.master.login });
+        if (Schedule.rdv.master && json.sendInvitationLink && Schedule.rdv.master.login != json.epitechEmail)
+            SchemaEvent.attendees.push({ email: Schedule.rdv.master.login });
 
-        // if (Schedule.rdv.members)
-        //     for (var member of Schedule.rdv.members)
-        //         if (member)
-        //             SchemaEvent.attendees.push({ email: member.login });
+        if (Schedule.rdv.members && json.sendInvitationLink)
+            for (var member of Schedule.rdv.members)
+                if (member && member.login != json.epitechEmail)
+                    SchemaEvent.attendees.push({ email: member.login });
         SchemaEvent.start = {
             'dateTime': Schedule.rdv.date.replace(" ", "T"),
             'timeZone': 'Europe/Paris',
@@ -149,8 +148,7 @@ function scheduleToGoogleCalendar(Schedule: ISchedule): calendar_v3.Schema$Event
 
 export async function getEpitechCalendar(): Promise<calendar_v3.Schema$Event[] | undefined> {
     // Get Schedule Epitech
-    var Schedules: ISchedule[] | undefined = await getScheduleEpitech();
-    if (Schedules == undefined) return undefined;
+    var Schedules: ISchedule[] = await getScheduleEpitech();
 
     // Keep only register Schedule
     Schedules = Schedules.filter(item => (item.event_registered));

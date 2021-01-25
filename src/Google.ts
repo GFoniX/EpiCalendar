@@ -10,9 +10,10 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = 'token.json';
 
 export function connectGoogleCalendar(callback: any) {
+    console.log("Here")
     // Load client secrets from a local file.
     fs.readFile('credentials.json', (err, content) => {
-        if (err) return console.log('Error loading client secret file:', err);
+        if (err) throw console.log('Error loading client secret file:', err);
         // Authorize a client with credentials, then call the Google Calendar API.
         authorize(JSON.parse(content.toString()), callback);
     });
@@ -56,11 +57,11 @@ function getAccessToken(oAuth2Client: any, callback: any) {
     rl.question('Enter the code from that page here: ', (code: any) => {
         rl.close();
         oAuth2Client.getToken(code, (err: any, token: any) => {
-            if (err) return console.error('Error retrieving access token', err);
+            if (err) throw console.error('Error retrieving access token', err);
             oAuth2Client.setCredentials(token);
             // Store the token to disk for later program executions
             fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
+                if (err) throw console.error(err);
                 console.log('Token stored to', TOKEN_PATH);
             });
             callback(oAuth2Client);

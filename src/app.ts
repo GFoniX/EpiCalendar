@@ -1,7 +1,7 @@
 import { calendar_v3, google } from 'googleapis';
-import { exit } from 'process';
 import { getEpitechCalendar } from './Epitech';
 import { connectGoogleCalendar } from './Google';
+import { json } from "./config";
 
 function addCalendar(calendar: calendar_v3.Calendar) {
     console.log("Calendar not found. Add new calendar Epitech")
@@ -94,4 +94,4 @@ async function refreshEpitechCalendar(auth: any) {
     });
 }
 
-connectGoogleCalendar(refreshEpitechCalendar);
+setInterval(connectGoogleCalendar, json.refreshTime, refreshEpitechCalendar)
