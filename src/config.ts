@@ -4,11 +4,11 @@ export var json = {
 
 
     /* Refresh time in ms */
-    refreshTime: 1000,
+    refreshTime: 10000,
 
 
     /* Send invitation link to teammate */
-    sendInvitationLink: false,
+    sendInvitationLink: true,
 
     /* You're epitech email (useless if sendInvitationLink is false)*/
     epitechEmail: "xxxxx.xxxxx@epitech.eu"
