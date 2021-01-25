@@ -55,9 +55,7 @@ async function refreshEpitechCalendar(auth: any) {
     const calendar: calendar_v3.Calendar = google.calendar({ version: 'v3', auth });
 
     calendar.calendarList.list({}, (err, result) => {
-        if (!result?.data.items) return;
-
-        var EpiCalendar: calendar_v3.Schema$Calendar | undefined = result.data.items.find(x => x.summary == "Epitech");
+        var EpiCalendar: calendar_v3.Schema$Calendar | undefined = result?.data?.items?.find(x => x.summary == "Epitech");
         if (!EpiCalendar) return addCalendar(calendar); // Add epitech Calendar
 
         calendar.events.list({
