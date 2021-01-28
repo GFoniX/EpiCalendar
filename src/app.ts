@@ -53,15 +53,13 @@ function sleep(ms: number) {
 
 async function refreshEpitechCalendar(auth: any) {
     const calendar: calendar_v3.Calendar = google.calendar({ version: 'v3', auth });
-
     calendar.calendarList.list({}, (err, result) => {
         var EpiCalendar: calendar_v3.Schema$Calendar | undefined = result?.data?.items?.find(x => x.summary == "Epitech");
         if (!EpiCalendar) return addCalendar(calendar); // Add epitech Calendar
-
         calendar.events.list({
             calendarId: EpiCalendar.id?.toString(),
             timeMin: (new Date()).toISOString().split('T')[0] + 'T00:00:00.000Z',
-            timeMax: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00.000Z',
+            timeMax: new Date(new Date().getTime() + 8 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T00:00:00.000Z',
             singleEvents: true,
             orderBy: 'startTime',
         }, async (err, res) => {
@@ -92,4 +90,9 @@ async function refreshEpitechCalendar(auth: any) {
     });
 }
 
-setInterval(connectGoogleCalendar, json.refreshTime, refreshEpitechCalendar)
+function startup() 
+{
+    setInterval(connectGoogleCalendar, json.refreshTime, refreshEpitechCalendar)
+}
+
+connectGoogleCalendar(startup);
