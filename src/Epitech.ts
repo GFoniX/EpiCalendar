@@ -148,7 +148,7 @@ function scheduleToGoogleCalendar(Schedule: ISchedule): calendar_v3.Schema$Event
 
 export async function getEpitechCalendar(): Promise<calendar_v3.Schema$Event[] | undefined> {
     // Get Schedule Epitech
-    var Schedules: ISchedule[] = await getScheduleEpitech();
+    var Schedules: ISchedule[] = await getScheduleEpitech().catch((error) => { throw error });
 
     // Keep only register Schedule
     Schedules = Schedules.filter(item => (item.event_registered));
@@ -160,7 +160,8 @@ export async function getEpitechCalendar(): Promise<calendar_v3.Schema$Event[] |
 
     // Get more infos about Schedule Rdv and replace it in the Schedule
     Schedules = Schedules.concat(((await Promise.all(SchedulesRdv.map(async function (item) {
-        item.rdv = await getInfosScheduleRdv(item);
+        var temp = await getInfosScheduleRdv(item).catch((error) => { console.log("Error can't get Rdv infos") });
+        if (temp != undefined) item.rdv = temp;
         return item;
     }))).filter(x => x != null) as any) as ISchedule[]);
 

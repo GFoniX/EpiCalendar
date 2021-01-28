@@ -68,8 +68,8 @@ async function refreshEpitechCalendar(auth: any) {
             var items: calendar_v3.Schema$Event[] = [];
             if (res?.data.items) items = res.data.items;
 
-            var ScheduleCalendars: calendar_v3.Schema$Event[] | undefined = await getEpitechCalendar();
-            if (!ScheduleCalendars) ScheduleCalendars = [];
+            var ScheduleCalendars: calendar_v3.Schema$Event[] | undefined | void = await getEpitechCalendar().catch((error) => { console.log(error) });
+            if (!ScheduleCalendars) return;
 
             for (var Schedule of ScheduleCalendars) {
                 if (eventIsInList(Schedule, items))
