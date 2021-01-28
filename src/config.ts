@@ -1,15 +1,15 @@
 export var json = {
     /* Epitech API key */
-    token: "auth-055e5f5afd90335b8f1d98552c50e36e2a3956d3",
+    token: "auth-f5492bd7706c7ef3dfd81d4f54246e3c76a40d22",
 
 
     /* Refresh time in ms */
-    refreshTime: 10000,
+    refreshTime: 60000,
 
 
     /* Send invitation link to teammate */
     sendInvitationLink: true,
 
     /* You're epitech email (useless if sendInvitationLink is false)*/
-    epitechEmail: "xxxxx.xxxxx@epitech.eu"
+    epitechEmail: "alexandre.titeux@epitech.eu"
 }

@@ -8,9 +8,9 @@ function getScheduleEpitech(): Promise<ISchedule[]> {
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/planning/load?format=json&start=${new Date().toISOString().split('T')[0]}&end=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`, (error, response, body) => {
             if (error)
-                throw console.error('error:', error);
+                throw 'error: ' + error;
             if (response.statusCode != 200)
-                throw console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body));
+                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + JSON.parse(body);
             resolve(JSON.parse(body));
         });
     });
@@ -20,9 +20,9 @@ function getInfosScheduleRdv(Schedule: ISchedule): Promise<SlotsEntity1 | undefi
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/module/${Schedule.scolaryear}/${Schedule.codemodule}/${Schedule.codeinstance}/${Schedule.codeacti}/rdv/?format=json`, (error, response, body) => {
             if (error)
-                throw console.error('error:', error);
+            throw 'error: ' + error;
             if (response.statusCode != 200)
-                throw console.error('statusCode:', response && response.statusCode, "\nbody:", JSON.parse(body));
+            throw 'statusCode: ' + response && response.statusCode + "\nbody: " + JSON.parse(body);
             var json: IScheduleRdv = JSON.parse(body);
             var groupId: number | undefined = json.group?.id;
             if (json.slots && groupId)
