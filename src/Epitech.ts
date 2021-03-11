@@ -3,6 +3,9 @@ import { json } from "./config";
 import { ISchedule } from './Interfaces/Epitech/ISchedule';
 import { IScheduleRdv, SlotsEntity1 } from './Interfaces/Epitech/IScheduleRdv';
 import { calendar_v3 } from 'googleapis';
+import { ICourse } from './Interfaces/Epitech/ICourse';
+import { IModule, ActivitesEntity } from './Interfaces/Epitech/IModule';
+import { toJSON } from './Tools';
 
 function getScheduleEpitech(): Promise<ISchedule[]> {
     return new Promise((resolve, reject) => {
@@ -10,8 +13,32 @@ function getScheduleEpitech(): Promise<ISchedule[]> {
             if (error)
                 throw error;
             if (response.statusCode != 200)
-                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + JSON.parse(body);
-            resolve(JSON.parse(body));
+                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body);
+            resolve(toJSON(body));
+        });
+    });
+}
+
+function getCoursesEpitech(): Promise<ICourse[]> {
+    return new Promise((resolve, reject) => {
+        request(`https://intra.epitech.eu/${json.token}/course/filter?format=json&location%5B%5D=FR&location%5B%5D=FR%2FMAR&course%5B%5D=bachelor%2Fclassic`, (error, response, body) => {
+            if (error)
+                throw error;
+            if (response.statusCode != 200)
+                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body);
+            resolve(toJSON(body));
+        });
+    });
+}
+
+function getModuleCourse(course: ICourse): Promise<IModule> {
+    return new Promise((resolve, reject) => {
+        request(`https://intra.epitech.eu/${json.token}/module/${course.scolaryear}/${course.code}/${course.codeinstance}/?format=json`, (error, response, body) => {
+            if (error)
+                throw error;
+            if (response.statusCode != 200)
+                console.log('statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body));
+            resolve(toJSON(body));
         });
     });
 }
@@ -166,4 +193,26 @@ export async function getEpitechCalendar(): Promise<calendar_v3.Schema$Event[] |
     }))).filter(x => x != null) as any) as ISchedule[]);
 
     return Schedules.map(scheduleToGoogleCalendar);
+}
+
+export async function getEpitechCourses(): Promise<undefined> {
+    // Get Courses Epitech
+    var Courses: ICourse[] = await getCoursesEpitech().catch((error) => { throw error });
+
+    // Keep only register Courses
+    Courses = Courses.filter(item => (item.status == "ongoing"));
+
+    var activities: ActivitesEntity[] = [];
+
+    for (var course of Courses) {
+        var module: IModule = await getModuleCourse(course);
+        if (module.activites)
+            for (var activitie of module.activites) {
+                if (activitie.register === "1" && activitie.is_projet && !activitie.title?.includes("Bootstrap") && !activitie.title?.includes("Back To The Future"))
+                    activities.push(activitie);
+            }
+    }
+
+    console.log(activities.map(x => x.module_title + " => " + x.title));
+    return undefined;
 }
