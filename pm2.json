@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "EpiCalendar",
+      "script": "npm",
+      "args": "start"
+    }
+  ]
+}

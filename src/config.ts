@@ -1,6 +1,6 @@
 export var json = {
     /* Epitech API key */
-    token: "auth-f5492bd7706c7ef3dfd81d4f54246e3c76a40d22",
+    token: "auth-317d027bf6ca8eef363128780b10511bd56d8827",
 
 
     /* Refresh time in ms */

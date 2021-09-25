@@ -1,4 +1,4 @@
-import { calendar_v3, google } from 'googleapis';
+import { calendar_v3 } from 'googleapis';
 
 export function addCalendar(calendar: calendar_v3.Calendar, calendarName: string) {
     console.log(`Calendar not found. Add new calendar ${calendarName}`)

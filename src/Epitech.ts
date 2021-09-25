@@ -11,9 +11,9 @@ function getScheduleEpitech(): Promise<ISchedule[]> {
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/planning/load?format=json&start=${new Date().toISOString().split('T')[0]}&end=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`, (error, response, body) => {
             if (error)
-                throw error;
+                reject(error);
             if (response.statusCode != 200)
-                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body);
+                reject('statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body));
             resolve(toJSON(body));
         });
     });
@@ -23,9 +23,9 @@ function getCoursesEpitech(): Promise<ICourse[]> {
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/course/filter?format=json&location%5B%5D=FR&location%5B%5D=FR%2FMAR&course%5B%5D=bachelor%2Fclassic`, (error, response, body) => {
             if (error)
-                throw error;
+                reject(error);
             if (response.statusCode != 200)
-                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body);
+                reject('statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body));
             resolve(toJSON(body));
         });
     });
@@ -35,7 +35,7 @@ function getModuleCourse(course: ICourse): Promise<IModule> {
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/module/${course.scolaryear}/${course.code}/${course.codeinstance}/?format=json`, (error, response, body) => {
             if (error)
-                throw error;
+                reject(error);
             if (response.statusCode != 200)
                 console.log('statusCode: ' + response && response.statusCode + "\nbody: " + toJSON(body));
             resolve(toJSON(body));
@@ -47,9 +47,9 @@ function getInfosScheduleRdv(Schedule: ISchedule): Promise<SlotsEntity1 | undefi
     return new Promise((resolve, reject) => {
         request(`https://intra.epitech.eu/${json.token}/module/${Schedule.scolaryear}/${Schedule.codemodule}/${Schedule.codeinstance}/${Schedule.codeacti}/rdv/?format=json`, (error, response, body) => {
             if (error)
-                throw error;
+               reject(error);
             if (response.statusCode != 200)
-                throw 'statusCode: ' + response && response.statusCode + "\nbody: " + JSON.parse(body);
+                reject('statusCode: ' + response && response.statusCode + "\nbody: " + JSON.parse(body));
             var json: IScheduleRdv = JSON.parse(body);
             var groupId: number | undefined = json.group?.id;
             if (json.slots && groupId)
