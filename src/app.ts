@@ -13,7 +13,7 @@ import {
 async function refreshEpiEventCalendar(
   calendar: calendar_v3.Calendar,
   result: calendar_v3.Schema$CalendarList | undefined
-) {
+): Promise<any> {
   return new Promise(async (resolve, reject) => {
     var EpiCalendar: calendar_v3.Schema$Calendar | undefined =
       result?.items?.find((x) => x.summary == "EpiEvent");
@@ -35,8 +35,9 @@ async function refreshEpiEventCalendar(
         var items: calendar_v3.Schema$Event[] = [];
         if (res?.data.items) items = res.data.items;
 
-        var ScheduleCalendars: calendar_v3.Schema$Event[] | undefined | void =
-          await getEpitechCalendar().catch((error) => resolve(error));
+        var ScheduleCalendars: calendar_v3.Schema$Event[] | void =
+          await getEpitechCalendar().catch((error) => reject(error));
+
         if (!ScheduleCalendars) return;
 
         for (var Schedule of ScheduleCalendars) {
@@ -59,6 +60,7 @@ async function refreshEpiEventCalendar(
 }
 
 async function refreshEpitechCalendar(auth: any): Promise<any> {
+
   return new Promise((resolve, reject) => {
     const calendar: calendar_v3.Calendar = google.calendar({
       version: "v3",
@@ -76,7 +78,9 @@ async function refreshEpitechCalendar(auth: any): Promise<any> {
 
 async function startup() {
   try {
-    await connectGoogleCalendar(refreshEpitechCalendar);
+    await connectGoogleCalendar(refreshEpitechCalendar).catch((reason) => {
+      throw reason;
+    });
   } catch (e) {
     console.error(e);
   }
